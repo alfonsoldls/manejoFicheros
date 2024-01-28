@@ -1,0 +1,4 @@
+INDEX VERSION 1.132+C:\Users\aleja\Desktop\EDIX\2º\Acceso a Datos\Actividad_1_Manejo_de_ficheros\.metadata\.plugins\org.eclipse.jdt.core
+981269029.index
+3118403774.index
+1865797976.index

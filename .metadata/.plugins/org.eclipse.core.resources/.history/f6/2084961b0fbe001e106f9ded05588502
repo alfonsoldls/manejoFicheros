@@ -1,0 +1,280 @@
+package test;
+
+import modelo.entidad.*;
+import java.util.*;
+import java.io.*;
+
+public class TestAlmacen {
+	
+	public static final String fichero = "articulos.dat";
+
+	public static void main(String[] args) {
+		
+		
+		File fn = new File(fichero);
+		
+		ArrayList<Articulo> listadoArticulos = verificarFichero(fn);
+		
+		int opcion = 0;
+		Scanner sc = new Scanner(System.in);
+		
+		do {
+			menu();
+			opcion = sc.nextInt();
+			
+			switch(opcion) {
+			
+			case 1:
+				listadoArticulos.add(add(listadoArticulos));
+				System.out.println("Artículo añadido correctamente.");
+				actualizarFichero(fn, listadoArticulos);
+				break;
+			
+			case 2:
+				borrar(listadoArticulos);
+				actualizarFichero(fn, listadoArticulos);
+				break;
+			
+			case 3:
+				consultar(listadoArticulos);
+				break;
+			
+			case 4:
+				listar(listadoArticulos);
+				break;	
+				
+			case 5:
+				exportar(listadoArticulos);
+				break;
+			
+			case 6:
+				System.out.println("Saliendo del programa...");
+				break;
+				
+			default:
+				System.out.println("Opción no válida");
+				break;	
+			}
+			
+		}while(opcion != 6);
+			
+		System.out.println("Programa finalizado.");
+		System.exit(0);
+
+	}
+	
+	public static void menu() {
+		System.out.println("");
+		System.out.println("-------MENÚ-------");
+		System.out.println("Seleccione una de las siguientes opciones:");
+		System.out.println("");
+		System.out.println("1. Añadir nuevo artículo");
+		System.out.println("2. Borrar artículo por id");
+		System.out.println("3. Consulta artículo por id");
+		System.out.println("4. Listado de todos los artículos");
+		System.out.println("5. Exportar artículos a archivo CSV");
+		System.out.println("6. Terminar el programa");
+		System.out.println("");
+	}
+	
+	public static ArrayList<Articulo> verificarFichero(File fn) {
+		
+		ArrayList<Articulo> listado = new ArrayList<Articulo>();
+		
+		if (fn.exists()) {
+			try (FileInputStream fis = new FileInputStream(fn);
+				 ObjectInputStream ois = new ObjectInputStream(fis);) {
+				
+				List<Articulo> listadoGuardado = (List<Articulo>)ois.readObject();
+
+				for(Articulo articulo : listadoGuardado){
+					Articulo a = new Articulo();
+					a.setId(articulo.getId());
+					a.setNombre(articulo.getNombre());
+					a.setDescripcion(articulo.getDescripcion());
+					a.setStock(articulo.getStock());
+					a.setPrecio(articulo.getPrecio());
+					listado.add(a);
+				}
+				
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} 
+			
+		}
+		
+		return listado;
+
+	}
+	
+	public static Articulo add(ArrayList<Articulo> listado) {
+		
+		Articulo a = new Articulo();
+		Scanner sc = new Scanner(System.in);
+		boolean encontrado = false;
+		int id = 0;
+		System.out.println("Escriba los datos que se indican a continuación sobre el artículo que desea añadir:");
+        System.out.println("ID:");
+		
+		do {
+	        while (!sc.hasNextInt()) {
+	            System.out.println("Valor incorrecto. Por favor, introduce un número entero para el ID:");
+	            sc.next();
+	        }
+	        
+	        id = sc.nextInt();
+	        sc.nextLine();
+        
+        
+        
+	        for (Articulo f : listado) {
+				if (f.getId() == id) {
+					encontrado = true;
+					System.out.println("El ID introducido ya existe, debe indicar otro diferente");
+					break;
+				}else {
+					encontrado = false;
+				}
+			}
+        
+        }while (encontrado);
+        
+        a.setId(id);
+        
+        System.out.println("Nombre:");
+        a.setNombre(sc.nextLine());
+
+        System.out.println("Descripción:");
+        a.setDescripcion(sc.nextLine());
+
+        System.out.println("Stock:");
+        while (!sc.hasNextInt()) {
+            System.out.println("Valor incorrecto. Por favor, introduce un número entero para el Stock:");
+            sc.next();
+        }
+        a.setStock(sc.nextInt());
+        sc.nextLine();
+
+        System.out.println("Precio:");
+        while (!sc.hasNextFloat()) {
+            System.out.println("Valor incorrecto. Por favor, introduce un número para el Precio:");
+            sc.next();
+        }
+        a.setPrecio(sc.nextFloat());
+		
+		return a;
+	}
+	
+	public static void consultar(ArrayList<Articulo> listado) {
+		Scanner sc = new Scanner(System.in);
+        int id;
+
+        while (true) {
+            System.out.println("Introduzca el ID del artículo que desea buscar:");
+            if (sc.hasNextInt()) {
+                id = sc.nextInt();
+                break;
+            } else {
+                System.out.println("Valor incorrecto. Por favor, introduzca un número entero.");
+                sc.next();
+            }
+        }
+		
+		for (Articulo a : listado) {
+			
+			if (a.getId() == id) {
+				System.out.println("ID: " + a.getId() + " - " + 
+						"Nombre: " + a.getNombre() + " - " + 
+						"Descripción: " + a.getDescripcion() + " - " + 
+						"Stock: " + a.getStock() + " - " +
+						"Precio: " + a.getPrecio());
+				return;
+			}
+		}
+		System.out.println("No se ha encontrado ningún artículo con el ID indicado.");
+	}
+	
+	public static ArrayList<Articulo> borrar(ArrayList<Articulo> listado) {
+		
+		boolean encontrado = false;
+		Scanner sc = new Scanner(System.in);
+        int id;
+
+        while (true) {
+            System.out.println("Introduzca el ID del artículo que desea borrar:");
+            if (sc.hasNextInt()) {
+                id = sc.nextInt();
+                break;
+            } else {
+                System.out.println("Valor incorrecto. Por favor, introduzca un número entero.");
+                sc.next();
+            }
+        }
+		
+		for (Articulo a : listado) {
+			if (a.getId() == id) {
+				listado.remove(a);
+				encontrado = true;
+				break;
+			}
+		}
+		
+		if (encontrado){
+			System.out.println("Artículo eliminado correctamente");
+		}else {
+			System.out.println("No se ha encontrado ningún artículo con el ID indicado.");
+		}
+		
+		return listado;
+	}
+	
+	
+	public static void listar(ArrayList<Articulo> listado) {
+		for (Articulo a : listado) {
+			System.out.println("ID: " + a.getId() + " - " + 
+								"Nombre: " + a.getNombre() + " - " + 
+								"Descripción: " + a.getDescripcion() + " - " + 
+								"Stock: " + a.getStock() + " - " +
+								"Precio: " + a.getPrecio());
+		}
+	}
+	
+	public static void actualizarFichero(File fn, ArrayList<Articulo> listado) {
+		try (FileOutputStream fos = new FileOutputStream(fn);
+				 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+				oos.writeObject(listado);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+	}
+	
+	public static void exportar (ArrayList<Articulo> listado) {
+		
+		try(FileWriter csv = new FileWriter("articulos.csv");
+				BufferedWriter buffer = new BufferedWriter(csv);){
+			
+			buffer.write("ID, Nombre, Descripcion, Stock, Precio");
+			buffer.newLine();
+			
+			for (Articulo a : listado) {
+				buffer.write(a.getId() + "," + a.getNombre() + "," + a.getDescripcion() + "," + 
+								a.getStock() + "," + a.getPrecio());
+				buffer.newLine();
+				
+			}
+		
+			System.out.println("Archivo CSV exportado correctamente");
+		
+		}catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+	}
+
+}

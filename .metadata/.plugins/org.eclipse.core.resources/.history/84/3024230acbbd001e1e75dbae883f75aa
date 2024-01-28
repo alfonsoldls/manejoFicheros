@@ -1,0 +1,25 @@
+package test;
+
+import modelo.entidad.*;
+
+public class TestAlmacen {
+
+	public static void main(String[] args) {
+		
+		menu();
+
+	}
+	
+	public static void menu() {
+		System.out.println("-------MENÚ-------");
+		System.out.println("Seleccione una de las siguientes opciones:");
+		System.out.println("");
+		System.out.println("1. Añadir nuevo artículo");
+		System.out.println("2. Borrar artículo por id");
+		System.out.println("3. Consulta artículo por id");
+		System.out.println("4. Listado de todos los artículos");
+		System.out.println("5. Terminar el programa");
+		System.out.println("");
+	}
+
+}
